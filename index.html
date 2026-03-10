@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn Tập Giữa Kì II - Tin Học 11 - Thầy Chuyền</title>
+    <style>
+        :root {
+            --primary: #2c5282;
+            --primary-light: #ebf4ff;
+            --bg-color: #f4f6f9;
+            --text-color: #333;
+            --correct: #c6f6d5;
+            --incorrect: #fed7d7;
+            --correct-border: #38a169;
+            --incorrect-border: #e53e3e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 { margin: 0; font-size: 24px; }
+        header p { margin: 5px 0 0 0; font-size: 16px; opacity: 0.9; }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background-color: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .tab-content.active { display: block; }
+
+        /* Question Box Style */
+        .question-box {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-left: 5px solid var(--primary);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .question-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        /* Multiple Choice Styles */
+        .options-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options-list li {
+            margin-bottom: 10px;
+        }
+
+        .options-list label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .options-list label:hover { background: var(--primary-light); }
+        .options-list input[type="radio"] { margin-right: 10px; transform: scale(1.2); }
+
+        /* True/False Grid Styles */
+        .tf-notice {
+            background-color: #fffaf0;
+            border-left: 4px solid #dd6b20;
+            padding: 15px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            color: #c05621;
+            border-radius: 4px;
+        }
+
+        .tf-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .tf-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .tf-text {
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+
+        .tf-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-choice {
+            flex: 1;
+            padding: 8px 0;
+            border: 1px solid #cbd5e0;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .btn-choice:hover { background: #edf2f7; }
+        .btn-choice.true-active { background: var(--correct); border-color: var(--correct-border); color: #22543d; }
+        .btn-choice.false-active { background: var(--incorrect); border-color: var(--incorrect-border); color: #742a2a; }
+
+        /* Essay Styles */
+        .essay-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .hint-box {
+            display: none;
+            background: var(--primary-light);
+            padding: 15px;
+            border-left: 4px solid var(--primary);
+            margin-top: 10px;
+            border-radius: 4px;
+            font-style: italic;
+        }
+
+        /* Global Buttons */
+        .action-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        .action-btn:hover { background-color: #1a365d; }
+        
+        .hint-btn {
+            background-color: #718096;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .hint-btn:hover { background-color: #4a5568; }
+
+        .score-board {
+            background: var(--primary-light);
+            border: 2px dashed var(--primary);
+            padding: 20px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .answer-key-board {
+            display: none;
+            margin-top: 30px;
+            background: white;
+            border: 1px solid #cbd5e0;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .answer-key-board h3 { margin-top: 0; color: var(--primary); }
+        .answer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+        }
+        .answer-item {
+            background: #f8fafc;
+            padding: 8px;
+            text-align: center;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            font-weight: bold;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .tf-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .tf-grid { grid-template-columns: 1fr; }
+            .tabs { flex-direction: column; }
+            .tab-btn { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>ĐỀ CƯƠNG ÔN TẬP GIỮA HỌC KÌ II - TIN HỌC 11</h1>
+        <p>Năm học 2025-2026 - Trường THPT Na Rì</p>
+    </header>
+
+    <div class="tabs">
+        <div class="tab-btn active" onclick="switchTab('tab-mcq', this)">I. Trắc nghiệm khách quan</div>
+        <div class="tab-btn" onclick="switchTab('tab-tf', this)">II. Trắc nghiệm Đúng/Sai</div>
+        <div class="tab-btn" onclick="switchTab('tab-essay', this)">III. Tự luận</div>
+    </div>
+
+    <!-- TAB 1: TRẮC NGHIỆM KHÁCH QUAN -->
+    <div id="tab-mcq" class="tab-content active">
+        <h2 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px;">Phần I: Câu hỏi Trắc nghiệm Khách quan (49 Câu)</h2>
+        <div id="mcq-container"></div>
+        <button class="action-btn" onclick="gradeMCQ()">Chấm điểm phần này</button>
+        <div id="mcq-score" class="score-board"></div>
+        
+        <!-- Bảng đáp án ẩn -->
+        <div id="mcq-answer-key" class="answer-key-board">
+            <h3>Bảng Đáp Án Tổng Hợp</h3>
+            <div id="answer-grid" class="answer-grid"></div>
+        </div>
+    </div>
+
+    <!-- TAB 2: TRẮC NGHIỆM ĐÚNG SAI -->
+    <div id="tab-tf" class="tab-content">
+        <h2 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px;">Phần II: Câu hỏi Trắc nghiệm Đúng/Sai (10 Câu)</h2>
+        <div class="tf-notice">
+            📌 Thang điểm áp dụng cho mỗi câu:<br>
+            - Lựa chọn chính xác 1 ý: 0.1 điểm<br>
+            - Lựa chọn chính xác 2 ý: 0.25 điểm<br>
+            - Lựa chọn chính xác 3 ý: 0.5 điểm<br>
+            - Lựa chọn chính xác cả 4 ý: 1.0 điểm
+        </div>
+        <div id="tf-container"></div>
+        <button class="action-btn" onclick="gradeTF()">Chấm điểm phần này</button>
+        <div id="tf-score" class="score-board"></div>
+    </div>
+
+    <!-- TAB 3: TỰ LUẬN -->
+    <div id="tab-essay" class="tab-content">
+        <h2 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px;">Phần III: Câu hỏi Tự luận (9 Câu)</h2>
+        <div id="essay-container"></div>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // DATA: TRẮC NGHIỆM KHÁCH QUAN (49 CÂU)
+    // ==========================================
+    const mcqData = [
+        { q: "Câu 1: Tại sao lại phải thay đổi thói quen quản lí thủ công, chuyển sang sử dụng máy tính với hệ QTCSD?", opts: ["A. Tiện lợi, kịp thời, nhanh chóng, hạn chế sai sót.", "B. Kịp thời xử lí.", "C. Nhanh chóng.", "D. Hạn chế được sai sót, tiết kiệm bộ nhớ."] },
+        { q: "Câu 2: Điền vào chỗ còn trống cụm từ thích hợp: So với việc quản lí thủ công thì Quản lý CSDL trên máy tính thường ..., tiết kiệm ... và công sức hơn so với quản lý thủ công.", opts: ["A. nhanh chóng, thời gian.", "B. nhanh chóng, tiền bạc", "C. chạy nhanh, dung lượng", "D. chính xác, không gian"] },
+        { q: "Câu 3: Do đâu mà Quản lý CSDL trên máy tính cung cấp khả năng kiểm soát truy cập và độ bảo mật cao hơn so với quản lý thủ công?", opts: ["A. Dữ liệu trong CSDL có thể được tìm kiếm, lọc, và phân tích theo nhiều tiêu chí...", "B. Các hoạt động cập nhật và chỉnh sửa dữ liệu trên máy tính thường được tự động hóa...", "C. Được trải nghiệm nhiều tính năng khác nhau: nghe, gọi, chơi trò chơi, xem video...", "D. Dữ liệu trong CSDL có thể được bảo vệ bằng các biện pháp bảo mật như mã hóa"] },
+        { q: "Câu 4: Do đâu mà Quản lý CSDL trên máy tính thường nhanh chóng, tiết kiệm thời gian và công sức hơn so với quản lý thủ công?", opts: ["A. Dữ liệu trong CSDL có thể được tìm kiếm, lọc, và phân tích theo nhiều tiêu chí...", "B. Các hoạt động cập nhật và chỉnh sửa dữ liệu trên máy tính thường được tự động hóa và có thể được thực hiện đồng thời trên nhiều bản ghi...", "C. Được trải nghiệm nhiều tính năng khác nhau: nghe, gọi, chơi trò chơi, xem video...", "D. Dữ liệu trong CSDL có thể được bảo vệ bằng các biện pháp bảo mật như mã hóa"] },
+        { q: "Câu 5: Do đâu mà Quản lý CSDL trên máy tính mang lại khả năng tra cứu và phân tích dữ liệu hiệu quả hơn so với quản lý thủ công?", opts: ["A. Dữ liệu trong CSDL có thể được tìm kiếm, lọc, và phân tích theo nhiều tiêu chí khác nhau trong thời gian ngắn...", "B. Các hoạt động cập nhật và chỉnh sửa dữ liệu trên máy tính thường được tự động hóa...", "C. Được trải nghiệm nhiều tính năng khác nhau...", "D. Dữ liệu trong CSDL có thể được bảo vệ bằng các biện pháp bảo mật..."] },
+        { q: "Câu 6: Chọn phương án sai. Các hệ QTCSDL phổ biến hiện nay là?", opts: ["A. MySQL", "B. ORACLE", "C. Microsoft SQL Server", "D. GIMP"] },
+        { q: "Câu 7: MySQL có hạn chế nào sau đây?", opts: ["A. Dễ sử dụng", "B. Giao diện dòng lệnh không thuận tiện với người dùng mới", "C. Miễn phí", "D. Tính ổn định và đáng tin cậy"] },
+        { q: "Câu 8: Nếu muốn quản lí thêm thông tin nơi sinh của nhạc sĩ, ca sĩ (tên tỉnh/thành phố), CSDL cần thay đổi như thế nào?", opts: ["A. Cần xóa bỏ cấu trúc CSDL và thay bằng cấu trúc khác", "B. Thêm các trường vào CSDL", "C. Cần thay đổi cấu trúc CSDL bằng cách thêm một bảng mới để lưu trữ thông tin này", "D. Thêm các bản ghi vào CSDL"] },
+        { q: "Câu 9: Để thêm thông tin ngày sinh của các nhạc sĩ, ca sĩ vào CSDL, bạn cần?", opts: ["A. Cần thay đổi cấu trúc CSDL bằng cách thêm một bảng mới...", "B. Thêm một trường mới vào bảng \"nhacsi\" và bảng \"casi\" để lưu trữ thông tin ngày sinh", "C. Cần xóa bỏ cấu trúc CSDL và thay bằng cấu trúc khác", "D. Thêm một trường mới vào bảng \"nhacsi\" để lưu trữ thông tin ngày sinh"] },
+        { q: "Câu 10: Để thực hiện mô hình quản lí danh sách tên quận/huyện của các tỉnh thành phố em phải xác định mối quan hệ giữa?", opts: ["A. Tỉnh thành phố và Quận/Huyện", "B. Tỉnh và Thị trấn", "C. Tỉnh và thị xã", "D. Huyện và thị trấn"] },
+        { q: "Câu 11: Để thực hiện mô hình quản lí danh sách tên quận/huyện của các tỉnh thành phố, em có thể xác định khóa chính trong trong bảng Tỉnh thành phố là", opts: ["A. Mã của huyện", "B. Mã của thị trấn", "C. Mã của tỉnh thành phố", "D. Mã của thị xã"] },
+        { q: "Câu 12: Để thực hiện mô hình quản lí danh sách tên quận/huyện của các tỉnh thành phố, em có thể xác định cấu trúc CSDL của bảng Tỉnh thành phố gồm?", opts: ["A. MaTinhThanhPho (khóa chính), TenHuyen", "B. MaTinhThanhPho (khóa chính), TenTinh ThanhPho", "C. MaHuyen (khóa chính), TenHuyen", "D. MaThiTran (khóa chính), TenThiTran"] },
+        { q: "Câu 13: Để thực hiện mô hình quản lí danh sách tên quận/huyện của các tỉnh thành phố, em có thể xác định cấu trúc CSDL của bảng Quận/Huyện gồm?", opts: ["A. MaQuanHuyen (khóa chính), TenTinhThanhPho", "B. MaQuanHuyen (khóa chính), TenQuanHuyen", "C. MaQuanHuyen (khóa chính), TenQuanHuyen, MaTinhThanhPho", "D. MaQuanHuyen (khóa chính), MaTinhThanhPho"] },
+        { q: "Câu 14: Để thực hiện mô hình quản lí danh sách tên quận/huyện của các tỉnh thành phố, trong bảng Quận/Huyện thì MaTinhThanhPho sẽ là?", opts: ["A. Khóa chính", "B. Khóa ngoài tham chiếu tới bảng Tỉnh thành phố", "C. Khóa ngoại tham chiếu tới bảng Quận/Huyện", "D. Khóa ngoài"] },
+        { q: "Câu 15: Việc đầu tiên để làm việc với một CSDL là?", opts: ["A. Thu thập dữ liệu", "B. Xử lý dữ liệu", "C. Tạo lập csdl", "D. Sửa chữa dữ liệu"] },
+        { q: "Câu 16: Việc đầu tiên để tạo lập một CSDL quan hệ là ?", opts: ["A. Thu thập dữ liệu", "B. Xử lý dữ liệu", "C. Tạo ra một hay nhiều bảng", "D. Cật nhật dữ liệu"] },
+        { q: "Câu 17: Mở HeidiSQL và kết nối đến cơ sở dữ liệu của bạn... có thể tạo mới một cơ sở dữ liệu bằng cách nhấp chuột phải vào?", opts: ["A. \" Create database\"", "B. \"Create new\"", "C. \"Root\"", "D. \"user\""] },
+        { q: "Câu 18: Sau khi kết nối đến cơ sở dữ liệu, bạn có thể chọn cơ sở dữ liệu đó trong?", opts: ["A. Danh sách cơ sở dữ liệu được hiển thị bên dưới của HeidiSQL", "B. Danh sách cơ sở dữ liệu được hiển thị bên phải của HeidiSQL", "C. Danh sách cơ sở dữ liệu được hiển thị bên trái của HeidiSQL", "D. Danh sách cơ sở dữ liệu được hiển thị ở dưới của HeidiSQL"] },
+        { q: "Câu 19: Để tạo bảng mới trong HeidiSQL, em chọn?", opts: ["A. \" Create database\"", "B. \"Root\"", "C. \"Create new\"", "D. \"Create row\""] },
+        { q: "Câu 20: Sau khi đã tạo các bảng, bạn có thể thiết lập các quan hệ giữa các bảng bằng cách?", opts: ["A. Thiết lập khóa phụ", "B. Thiết lập khóa chính", "C. Thiết lập khóa ngoại", "D. Thiết lập khóa chính, khóa phụ"] },
+        { q: "Câu 21: Khi chọn thêm mới để thêm trường thì một trường mới hiện ra với tên mặc định là?", opts: ["A. Cột mới", "B. Trường mới", "C. Column 1", "D. Row 1"] },
+        { q: "Câu 22: Để ấn định khóa chính thì ta thực hiện?", opts: ["A. Chọn Create new index -> Primary", "B. Chọn Create new index -> Key", "C. Chọn Create new index -> Unique", "D. Chọn Create new index -> Fulltext"] },
+        { q: "Câu 23: Khoá ngoài có tác dụng?", opts: ["A. Thể hiện dữ liệu chính", "B. Liên kết các dữ liệu trong bảng với nhau", "C. Liên kết dữ liệu giữa các bảng", "D. Liên kết dữ liệu giữa các trường"] },
+        { q: "Câu 24: Để chọn giá trị mặc định là AUTO_INCREMENT thì nháy chuột vào ô?", opts: ["A. Allow NULL", "B. Add column", "C. No default", "D. Zerofill"] },
+        { q: "Câu 25: Các trường là khóa ngoài của bảng là ?", opts: ["A. Các dữ liệu trong một cột liên kết đến một cột của bảng khác", "B. Các ô trong bảng liên kết đến một ô của bảng khác", "C. Các trường tham chiếu đến một trường khóa chính của bảng khác", "D. Các hàng trong bảng liên kết đến một hàng của bảng khác"] },
+        { q: "Câu 26: Tên các trường không được trùng lặp giá trị nên phải khai báo khóa?", opts: ["A. Chính", "B. Phụ", "C. Cẩm trùng lặp", "D. Ngoài"] },
+        { q: "Câu 27: Để khai báo khóa ngoài chọn thẻ?", opts: ["A. \" Create database\"", "B. \"Create new\"", "C. \"Root\"", "D. Foreign keys"] },
+        { q: "Câu 28: Bảng banthuam có các trường nào dưới đây?", opts: ["A. Idbanthuam, idbannhac, tenbanthuam", "B. Idbanthuam, idbannhac, idcasi", "C. Idbanthuam, tenbannhac, idcasi", "D. Idbanthuam, tenbanthuam, idcasi"] },
+        { q: "Câu 29: Để truy xuất dữ liệu từ bảng \"casi\" theo các tiêu chí khác nhau, có thể sử dụng?", opts: ["A. Trực tiếp lọc ra các dữ liệu thủ công", "B. Đặt lệnh và thực hiện lệnh", "C. Ngôn ngữ truy vấn cơ sở dữ liệu (SQL) để tạo các câu truy vấn phù hợp", "D. Câu lệnh truy vấn"] },
+        { q: "Câu 30: Muốn truy xuất tất cả các dòng dữ liệu từ bảng \"casi\" ta dùng ?", opts: ["A. SELECT * FROM casi WHERE tencasi LIKE '% Hoa%';", "B. SELECT * FROM casi WHERE idcasi =1;", "C. SELECT * FROM casi;", "D. SELECT * FROM casi WHERE tencasi LIKE 'N%';"] },
+        { q: "Câu 31: Muốn truy xuất các ca sĩ theo thứ tự tên theo thứ tự từ A đến Z ta dùng ?", opts: ["A. SELECT * FROM casi WHERE tencasi LIKE '% Hoa%';", "B. SELECT * FROM casi WHERE idcasi =1;", "C. SELECT * FROM casi ORDER BY tencasi ASC;", "D. SELECT * FROM casi WHERE tencasi LIKE 'N%';"] },
+        { q: "Câu 32: Muốn truy xuất dữ liệu các ca sĩ có \"idcasi\" nằm trong danh sách (1, 2, 3) ta dùng ?", opts: ["A. SELECT * FROM casi WHERE tencasi LIKE '%Hoa%';", "B. SELECT * FROM casi WHERE idcasi =1;", "C. SELECT * FROM casi WHERE idcasi IN (1, 2, 3);", "D. SELECT * FROM casi WHERE tencasi LIKE 'N%';"] },
+        { q: "Câu 33: Muốn truy xuất dữ liệu các ca sĩ theo thứ tự \"idcasi\" giảm dần ta dùng ?", opts: ["A. SELECT * FROM casi WHERE tencasi LIKE '% Hoa%';", "B. SELECT * FROM casi WHERE idcasi =1;", "C. SELECT * FROM casi ORDER BY idcasi DESC;", "D. SELECT * FROM casi WHERE tencasi LIKE 'N%';"] },
+        { q: "Câu 34: Muốn truy xuất dữ liệu các ca sĩ có \"idcasi\" là 1 ta dùng ?", opts: ["A. SELECT * FROM casi WHERE tencasi LIKE '% Hoa%';", "B. SELECT * FROM casi WHERE idcasi =1;", "C. SELECT * FROM casi;", "D. SELECT * FROM casi WHERE tencasi LIKE 'N%';"] },
+        { q: "Câu 35: Muốn truy xuất dữ liệu các ca sĩ có \"tencasi\" bắt đầu bằng chữ \"N\" ta dùng ?", opts: ["A. SELECT * FROM casi WHERE tencasi LIKE '% Hoa%';", "B. SELECT * FROM casi WHERE idcasi =1;", "C. SELECT * FROM casi;", "D. SELECT * FROM casi WHERE tencasi LIKE 'N%';"] },
+        { q: "Câu 36: Muốn truy xuất dữ liệu các ca sĩ có \"tencasi\" chứa từ khóa \"Hoa\" ta dùng ?", opts: ["A. SELECT * FROM casi WHERE tencasi LIKE '% Hoa%';", "B. SELECT * FROM casi WHERE idcasi =1;", "C. SELECT * FROM casi:", "D. SELECT * FROM casi WHERE tencasi LIKE 'N%';"] },
+        { q: "Câu 37: Để thêm vào một hàng dữ liệu mới ta dùng?", opts: ["A. Nhấn phím Insert", "B. Chọn biểu tường dấu cộng + tròn màu xanh", "C. Nháy nút phải chuột lên vùng dữ liệu của bảng và chọn Chèn hàng", "D. Tích hợp quy mô rất lớn..."] },
+        { q: "Câu 38: Để chỉnh sửa dữ liệu trong bảng ta thực hiện?", opts: ["A. Nháy đúp chuột vào ô dữ liệu cần sửa và nhập lại", "B. Nhấn phím Insert", "C. Nháy nút phải chuột vào ô cần sửa", "D. Nháy nút trái chuột vào ô dữ liệu cần sửa"] },
+        { q: "Câu 39: Để xem toàn bộ dữ liệu trong bảng ta chọn thẻ?", opts: ["A. Truy vấn", "B. Table:......", "C. Dữ liệu", "D. Database"] },
+        { q: "Câu 40: Để lấy ra danh sách dữ liệu thỏa mãn một yêu cầu nào đó ta thực hiện?", opts: ["A. Các thao tác tạo bộ lọc", "B. Các thao tác xóa", "C. Các thao tác sắp xếp", "D. Các thao tác sửa dữ liệu"] },
+        { q: "Câu 41: Để xóa bộ lọc ta chọn?", opts: ["A. Dọn dẹp và Lọc B. Lọc", "B. Các thao tác xóa", "C. Quick Filter", "D. Find next"] },
+        { q: "Câu 42: Để biểu diễn thứ tự tăng dần ta dùng?", opts: ["A. DESC", "B. LIKE", "C. AND", "D. ASC"] },
+        { q: "Câu 43: Để biểu diễn thứ tự GIẢM dần ta dùng?", opts: ["A. ASC", "B. LIKE", "C. AND", "D. DESC"] },
+        { q: "Câu 44: Để truy vấn dữ liệu trong sql ta sử dụng?", opts: ["A. Mệnh đề ORDER BY", "B. Cú pháp câu lệnh SELECT", "C. Dùng toán tử BETWEEN...AND", "D. Cú pháp câu lệnh FROM"] },
+        { q: "Câu 45: Để truy xuất dữ liệu từ bảng \"banthuam\" với điều kiện cụ thể trên trường \"idbannhac\" ta dùng câu lệnh?", opts: ["A. SELECT * FROM banthuam;", "B. SELECT * FROM banthuam ORDER BY idbannhac ASC;", "C. SELECT idbannhac, idcasi FROM banthuam;", "D. SELECT * FROM banthuam WHERE idbannhac =1;"] },
+        { q: "Câu 46: Để truy xuất tất cả dữ liệu từ bảng \"banthuam\" ta dùng câu lệnh?", opts: ["A. SELECT * FROM banthuam;", "B. SELECT * FROM banthuam ORDER BY idbannhac ASC;", "C. SELECT idbannhac, idcasi FROM banthuam;", "D. SELECT * FROM banthuam WHERE idbannhac =1;"] },
+        { q: "Câu 47: Trường idNhacsi là trường khóa ngoài tham chiếu... để đảm bảo giá trị nhất quán hợp lệ chỉ có thể lấy từ?", opts: ["A. idNhacsi có trong bảng tenBannhac", "B. nhacsi có trong bảng idNhacsi", "C. idNhacsi có trong bảng nhacsi", "D. idNhacsi có trong bảng casi"] },
+        { q: "Câu 48: Để chỉnh sửa dữ liệu trong bảng ta thực hiện?", opts: ["A. Nháy đúp chuột vào ô dữ liệu muốn sửa", "B. Nháy nút trái chuột vào ô dữ liệu muốn sửa", "C. Nhấn và giữ nút phải chuột vào ô dữ liệu muốn sửa", "D. Đáp án khác"] },
+        { q: "Câu 49: Hệ QTCSDL không ngăn chặn được các lỗi nào dưới đây?", opts: ["A. Lỗi theo logic đã được khai báo", "B. Các lỗi không liên quan đến logic nào", "C. Lỗi theo logic chưa được khai báo", "D. Lỗi theo kí tự đã được khai báo"] }
+    ];
+
+    // Đáp án MCQ mô phỏng (A=0, B=1, C=2, D=3)
+    const mcqAnswers = [0,0,3,1,0,3,1,2,1,0,2,1,2,1,2,2,0,2,2,2,2,0,2,0,2,0,3,3,2,2,2,2,2,1,3,0,2,0,2,0,0,3,3,1,3,0,2,0,2];
+    const optionLetters = ['A', 'B', 'C', 'D'];
+
+    // ==========================================
+    // DATA: TRẮC NGHIỆM ĐÚNG/SAI (10 CÂU)
+    // ==========================================
+    const tfData = [
+        { q: "Câu 1: Sau khi có máy tính và giải pháp quản trị CSDL trên máy tính, ngành ngân hàng đã có những thay đổi sau:", items: ["a. Giảm thời gian thực hiện cho mỗi giao dịch.", "b. Nhân viên ngân hàng không có việc làm vì bị thay thế hoàn toàn.", "c. Việc tìm kiếm, xác định khách hàng được thực hiện một cách nhanh chóng.", "d. Nhiều hệ QTCSDL cho phép cài đặt bổ sung các dịch vụ trực tuyến..."] },
+        { q: "Câu 2: HeidiSQL là một phần mềm hỗ trợ giao tiếp với hệ quản trị CSDL MySQL.", items: ["a) HeidiSQL có giao diện dòng lệnh, yêu cầu người dùng phải nhớ cú pháp các lệnh.", "b) HeidiSQL là một phần mềm miễn phí, có giao diện đồ họa thân thiện với người dùng.", "c) HeidiSQL hỗ trợ kết nối với nhiều hệ quản trị CSDL khác nhau, không chỉ MySQL.", "d) Người dùng có thể sử dụng HeidiSQL để tạo lập CSDL, tạo bảng, cập nhật..."] },
+        { q: "Câu 3: Để kết nối với MySQL, cần phải nhập đúng tên người dùng và mật khẩu.", items: ["a) Mật khẩu của người dùng root được tạo trong quá trình cài đặt MySQL.", "b) Có thể kết nối với MySQL mà không cần mật khẩu.", "c) Việc nhập đúng tên người dùng và mật khẩu giúp đảm bảo an toàn cho hệ thống CSDL.", "d) Nếu quên mật khẩu, người dùng có thể sử dụng các công cụ khôi phục..."] },
+        { q: "Câu 4: Ngân hàng X đang gặp khó khăn trong việc quản lý dữ liệu khách hàng...", items: ["a) Hệ quản trị CSDL giúp quản lý dữ liệu một cách hiệu quả.", "b) Ứng dụng hệ quản trị CSDL không thể cải thiện tốc độ tìm kiếm thông tin.", "c) Hệ quản trị CSDL giúp tăng tốc độ truy xuất thông tin...", "d) Ngân hàng X có thể sử dụng hệ quản trị CSDL để quản lý thông tin..."] },
+        { q: "Câu 5: Lan là nhân viên ngân hàng. Cô ấy muốn tìm hiểu về các lợi ích của việc ứng dụng hệ quản trị CSDL trong công việc.", items: ["a) Hệ quản trị CSDL giúp giảm thiểu sai sót trong quá trình nhập liệu và xử lý.", "b) Hệ quản trị CSDL không hỗ trợ các giao dịch trực tuyến.", "c) Hệ quản trị CSDL giúp tiết kiệm thời gian và chi phí cho ngân hàng.", "d) Lan có thể tìm hiểu thêm về các hệ quản trị CSDL phổ biến..."] },
+        { q: "Câu 6: Thư viện trường THPT Na Rì mỗi ngày đón nhiều học sinh đến mượn sách. Do vẫn ghi chép sổ thủ công, việc tìm kiếm chậm và dễ sai sót...", items: ["a) Giúp việc tìm kiếm thông tin học sinh mượn sách được thực hiện một cách nhanh chóng...", "b) Thao tác trên máy tính tốn thời gian rà soát thủ công nên tốc độ làm việc vẫn chậm như cũ.", "c) Hạn chế tối đa những dư thừa, nhầm lẫn và đảm bảo tính nhất quán...", "d) Việc ứng dụng trên máy tính chỉ giới hạn trong lĩnh vực ngân hàng..."] },
+        { q: "Câu 7: Trong giờ thực hành, bạn Nam đang tìm hiểu về MySQL để thiết kế cơ sở dữ liệu...", items: ["a) MySQL là một sản phẩm hệ quản trị cơ sở dữ liệu mã nguồn mở và được cung cấp miễn phí.", "b) Tốc độ xử lý của MySQL chậm nên phần mềm này không thích hợp cho các bài toán trên Internet.", "c) Hệ quản trị này hỗ trợ quản lý chặt chẽ sự nhất quán dữ liệu, đảm bảo an ninh...", "d) MySQL cung cấp sẵn phần mềm khách dùng giao diện đồ họa rất thân thiện..."] },
+        { q: "Câu 8: Sau khi cài đặt xong hệ quản trị CSDL MySQL trên máy tính thực hành, giáo viên yêu cầu học sinh kết nối vào hệ thống...", items: ["a) Sau khi cài đặt hoàn tất, phần mềm MySQL sẽ hoạt động trên máy tính như một dịch vụ hệ thống (Service).", "b) Để tiết kiệm thời gian, trong quá trình cài tự động không cần thiết lập mật khẩu cho người dùng root.", "c) Học sinh có thể dùng cửa sổ dòng lệnh (cmd.exe) và gõ cú pháp mysql -u root -p...", "d) Công cụ mặc định mysql.exe sử dụng giao diện đồ họa trực quan..."] },
+        { q: "Câu 9: Nhận thấy thao tác qua dòng lệnh khá khô khan, giáo viên hướng dẫn học sinh cài thêm HeidiSQL...", items: ["a) HeidiSQL là một phần mềm dùng giao diện đồ họa, giúp người dùng mới kết nối và thao tác thuận tiện hơn.", "b) Phần mềm này là bản thương mại nên học sinh bắt buộc phải trả phí bản quyền...", "c) Một ưu điểm rất lớn của HeidiSQL đối với người dùng là phần mềm này có hỗ trợ giao diện tiếng Việt.", "d) HeidiSQL được thiết kế riêng biệt và chỉ cho phép kết nối duy nhất với hệ quản trị CSDL MySQL."] },
+        { q: "Câu 10: Khi mở HeidiSQL lần đầu, cửa sổ \"Trình quản lý phiên\" sẽ xuất hiện để cấu hình kết nối...", items: ["a) Tại ô \"Tên máy chủ / IP\", học sinh có thể giữ nguyên giá trị mặc định là 127.0.0.1.", "b) Ô \"Người dùng\" mặc định sẽ lấy tên máy tính, học sinh không cần nhập chữ \"root\" vào đây.", "c) Giá trị ở ô \"Cổng\" được đặt mặc định là 3306, đây là cổng giao tiếp dành cho các hệ QTCSDL.", "d) Người dùng chỉ cần nhấn nút \"Mở\", phần mềm sẽ tự động đăng nhập mà không yêu cầu nhập mật khẩu."] }
+    ];
+
+    // Đáp án Đúng/Sai mô phỏng (true = Đúng, false = Sai)
+    const tfAnswers = [
+        [true, false, true, true],
+        [false, true, true, true],
+        [true, false, true, true],
+        [true, false, true, true],
+        [true, false, true, true],
+        [true, false, true, false],
+        [true, false, true, false],
+        [true, false, true, false],
+        [true, false, false, false], // c: Heidi không có TV (tuỳ version), d: support nhiều
+        [true, false, true, false]
+    ];
+
+    // ==========================================
+    // DATA: TỰ LUẬN (9 CÂU)
+    // ==========================================
+    const essayData = [
+        { q: "Câu 1: Phân tích những rủi ro của việc quản lý dữ liệu thủ công bằng sổ sách. Việc chuyển sang sử dụng hệ quản trị cơ sở dữ liệu trên máy tính giúp khắc phục những rủi ro đó như thế nào?", hint: "Gợi ý: Quản lý thủ công tốn công sức, khó tra cứu, dễ sai sót, bảo mật thấp. HQT CSDL giúp tra cứu nhanh, tự động hoá, nhất quán, an toàn." },
+        { q: "Câu 2: Khóa chính (Primary Key) trong cơ sở dữ liệu quan hệ là gì? Tại sao trong bảng quản lý dữ liệu học sinh của trường, ta nên chọn trường \"Mã học sinh\" làm khóa chính thay vì trường \"Họ và tên\"?", hint: "Gợi ý: Khóa chính dùng để phân biệt duy nhất mỗi bản ghi. Chọn Mã HS vì là duy nhất, không trùng lặp. Họ tên dễ bị trùng." },
+        { q: "Câu 3: Khóa ngoại (Foreign Key) có vai trò gì trong cơ sở dữ liệu? Hãy lấy một ví dụ thực tế về việc sử dụng khóa ngoại để liên kết hai bảng dữ liệu với nhau.", hint: "Gợi ý: Dùng liên kết dữ liệu giữa 2 bảng, đảm bảo toàn vẹn tham chiếu. VD: ma_lop trong bảng HocSinh tham chiếu đến khóa chính ma_lop trong bảng LopHoc." },
+        { q: "Câu 4: Khi thiết kế bảng dữ liệu, việc xác định đúng kiểu dữ liệu cho từng trường (ví dụ: INT, VARCHAR, DATE) mang lại lợi ích gì?", hint: "Gợi ý: Tối ưu không gian lưu trữ, đảm bảo tính chính xác dữ liệu nhập vào, tăng tốc độ truy vấn." },
+        { q: "Câu 5: Giả sử em đang thao tác với cơ sở dữ liệu thư viện. Hãy viết câu lệnh SQL để truy xuất và hiển thị toàn bộ thông tin từ bảng \"sach\".", hint: "Gợi ý: SELECT * FROM sach;" },
+        { q: "Câu 6: Dựa vào bảng \"sach\" trong cơ sở dữ liệu, em hãy viết câu lệnh SQL để lọc và hiển thị danh sách các cuốn sách được xuất bản vào năm 2023 (biết trường năm xuất bản tên là \"nam_xb\").", hint: "Gợi ý: SELECT * FROM sach WHERE nam_xb = 2023;" },
+        { q: "Câu 7: Nhà trường vừa nhập thêm một cuốn sách mới vào thư viện. Em hãy viết câu lệnh SQL để thêm dữ liệu cuốn sách có mã sách \"S01\", tên sách \"Tin học 11\" vào bảng \"sach\" (giả sử bảng chỉ có 2 trường này).", hint: "Gợi ý: INSERT INTO sach VALUES ('S01', 'Tin học 11');" },
+        { q: "Câu 8: Trong quá trình nhập liệu, một bạn vô tình gõ sai tên của cuốn sách có mã là \"S02\". Em hãy viết câu lệnh SQL để cập nhật (sửa) lại tên cuốn sách này thành \"Lập trình Python\" trong bảng \"sach\".", hint: "Gợi ý: UPDATE sach SET ten_sach = 'Lập trình Python' WHERE ma_sach = 'S02';" },
+        { q: "Câu 9: Em hãy tự đề xuất cấu trúc cho bảng \"DoanVien\" của lớp, bao gồm ít nhất 4 trường dữ liệu, chỉ rõ kiểu dữ liệu tương ứng cho từng trường và xác định trường nào nên được chọn làm khóa chính.", hint: "Gợi ý: ma_doan_vien (INT/VARCHAR) - Khóa chính, ho_ten (VARCHAR), ngay_sinh (DATE), chi_doan (VARCHAR)." }
+    ];
+
+    // ==========================================
+    // RENDERING FUNCTIONS
+    // ==========================================
+    function renderMCQ() {
+        const container = document.getElementById('mcq-container');
+        let html = '';
+        mcqData.forEach((q, index) => {
+            html += `<div class="question-box">
+                <div class="question-title">${q.q}</div>
+                <ul class="options-list">`;
+            q.opts.forEach((opt, oIndex) => {
+                html += `<li>
+                    <label>
+                        <input type="radio" name="mcq_${index}" value="${oIndex}">
+                        ${opt}
+                    </label>
+                </li>`;
+            });
+            html += `</ul></div>`;
+        });
+        container.innerHTML = html;
+        
+        // Tạo bảng đáp án ẩn
+        const grid = document.getElementById('answer-grid');
+        let ansHtml = '';
+        mcqAnswers.forEach((ans, idx) => {
+            ansHtml += `<div class="answer-item">${idx + 1} - ${optionLetters[ans]}</div>`;
+        });
+        grid.innerHTML = ansHtml;
+    }
+
+    // STATE LƯU TRỮ LỰA CHỌN ĐÚNG/SAI
+    let tfUserChoices = {};
+
+    function renderTF() {
+        const container = document.getElementById('tf-container');
+        let html = '';
+        tfData.forEach((q, qIndex) => {
+            tfUserChoices[qIndex] = [null, null, null, null]; // 4 ý chưa chọn
+            
+            html += `<div class="question-box">
+                <div class="question-title">${q.q}</div>
+                <div class="tf-grid">`;
+            
+            q.items.forEach((item, iIndex) => {
+                html += `<div class="tf-item">
+                    <div class="tf-text">${item}</div>
+                    <div class="tf-actions">
+                        <button class="btn-choice btn-true-${qIndex}-${iIndex}" onclick="selectTF(${qIndex}, ${iIndex}, true)">Đúng</button>
+                        <button class="btn-choice btn-false-${qIndex}-${iIndex}" onclick="selectTF(${qIndex}, ${iIndex}, false)">Sai</button>
+                    </div>
+                </div>`;
+            });
+            
+            html += `</div></div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function selectTF(qIndex, iIndex, isTrue) {
+        tfUserChoices[qIndex][iIndex] = isTrue;
+        
+        // Reset classes
+        const btnTrue = document.querySelector(`.btn-true-${qIndex}-${iIndex}`);
+        const btnFalse = document.querySelector(`.btn-false-${qIndex}-${iIndex}`);
+        
+        btnTrue.classList.remove('true-active');
+        btnFalse.classList.remove('false-active');
+        
+        // Add active class
+        if(isTrue) {
+            btnTrue.classList.add('true-active');
+        } else {
+            btnFalse.classList.add('false-active');
+        }
+    }
+
+    function renderEssay() {
+        const container = document.getElementById('essay-container');
+        let html = '';
+        essayData.forEach((q, index) => {
+            html += `<div class="question-box">
+                <div class="question-title">${q.q}</div>
+                <textarea class="essay-input" placeholder="Nhập câu trả lời của em vào đây..."></textarea>
+                <button class="hint-btn" onclick="toggleHint(${index})">Hiển thị / Ẩn Gợi ý</button>
+                <div id="hint-${index}" class="hint-box">${q.hint}</div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function toggleHint(index) {
+        const hintBox = document.getElementById(`hint-${index}`);
+        if(hintBox.style.display === 'block') {
+            hintBox.style.display = 'none';
+        } else {
+            hintBox.style.display = 'block';
+        }
+    }
+
+    // ==========================================
+    // GRADING LOGIC
+    // ==========================================
+    function gradeMCQ() {
+        let score = 0;
+        mcqData.forEach((_, index) => {
+            const selected = document.querySelector(`input[name="mcq_${index}"]:checked`);
+            if (selected && parseInt(selected.value) === mcqAnswers[index]) {
+                score++;
+            }
+        });
+        
+        const scoreBoard = document.getElementById('mcq-score');
+        scoreBoard.innerHTML = `Điểm của em: ${score} / ${mcqData.length} câu đúng.<br>
+            <span style="font-size:16px; font-weight:normal;">Hãy xem Bảng đáp án bên dưới để đối chiếu!</span>`;
+        scoreBoard.style.display = 'block';
+        
+        // Hiện bảng đáp án
+        document.getElementById('mcq-answer-key').style.display = 'block';
+    }
+
+    function gradeTF() {
+        let totalScore = 0;
+        
+        for (let qIndex = 0; qIndex < tfData.length; qIndex++) {
+            let correctParts = 0;
+            const userAns = tfUserChoices[qIndex];
+            const correctAns = tfAnswers[qIndex];
+            
+            for (let i = 0; i < 4; i++) {
+                if (userAns[i] !== null && userAns[i] === correctAns[i]) {
+                    correctParts++;
+                }
+            }
+            
+            // Tính điểm theo quy tắc mới
+            let pointsForQ = 0;
+            if (correctParts === 1) pointsForQ = 0.1;
+            else if (correctParts === 2) pointsForQ = 0.25;
+            else if (correctParts === 3) pointsForQ = 0.5;
+            else if (correctParts === 4) pointsForQ = 1.0;
+            
+            totalScore += pointsForQ;
+        }
+
+        const scoreBoard = document.getElementById('tf-score');
+        scoreBoard.innerHTML = `Tổng điểm phần Đúng/Sai: ${totalScore.toFixed(2)} / 10.0 điểm`;
+        scoreBoard.style.display = 'block';
+    }
+
+    // ==========================================
+    // TAB NAVIGATION
+    // ==========================================
+    function switchTab(tabId, btnElement) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        btnElement.classList.add('active');
+    }
+
+    // Khởi tạo giao diện khi load trang
+    window.onload = () => {
+        renderMCQ();
+        renderTF();
+        renderEssay();
+    };
+</script>
+</body>
+</html>
